@@ -1,0 +1,17 @@
+:root { --gap: 16px; --max: 1200px; }
+* { box-sizing: border-box; }
+body { margin: 0; font: 16px/1.5 system-ui, -apple-system, Inter, Arial; color:#111; background:#fafafa; }
+header, footer { max-width: var(--max); margin: 24px auto; padding: 0 16px; }
+h1 { font-weight: 900; letter-spacing: -0.02em; margin: 0 0 4px; }
+.grid { 
+  display: grid; 
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
+  gap: var(--gap); 
+  max-width: var(--max); margin: 24px auto; padding: 0 16px;
+}
+.card { background:#fff; border:1px solid #eee; border-radius: 16px; overflow: hidden; }
+.card img { width: 100%; display: block; aspect-ratio: 4/5; object-fit: cover; background:#f0f0f0; }
+.card .meta { padding: 12px 14px; }
+.card .title { font-weight: 800; margin: 0 0 4px; }
+.card .sub { color:#666; font-size: 14px; }
+.card a { text-decoration: none; color: inherit; }
