@@ -1,0 +1,11 @@
+{
+  "name": "creative-coding",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "gallery": "node scripts/generate-gallery.mjs",
+    "prepare": "npm run gallery",
+    "dev": "python3 -m http.server -d site 8080 || py -m http.server -d site 8080"
+  },
+  "devDependencies": {}
+}
