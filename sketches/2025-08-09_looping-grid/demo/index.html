@@ -3,18 +3,31 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Demo</title>
+  <title>GLITCH Demo</title>
   <style>
-    :root { color-scheme: dark light; }
-    html, body { margin:0; height:100%; }
-    body { background:#0a0a0a; display:grid; place-items:center; }
-    canvas { display:block; width:min(100%, 1080px); height:auto; background:#000; border-radius:12px }
-    .msg { position:fixed; bottom:10px; left:50%; transform:translateX(-50%); opacity:.7; font:14px ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica Neue,Arial }
+    html,body { margin: 0; height: 100%; background: #000; }
+    main { display: grid; place-items: center; height: 100%; }
+    canvas { display: block; background: #000; }
   </style>
+  <!-- UMD билды -->
+  <script src="https://unpkg.com/canvas-sketch@0.7.7/dist/canvas-sketch.umd.js"></script>
+  <script src="https://unpkg.com/canvas-sketch-util@1.10.0/build/canvas-sketch-util.min.js"></script>
+  
+  <!-- Простой shim для require() -->
+  <script>
+    window.require = (name) => {
+      if (name === 'canvas-sketch') return window.canvasSketch;
+      if (name === 'canvas-sketch-util/random') return window.canvasSketchUtil.random;
+      if (name === 'canvas-sketch-util/math') return window.canvasSketchUtil.math;
+      throw new Error('Unknown module: ' + name);
+    };
+  </script>
 </head>
 <body>
-  <canvas id="c"></canvas>
-  <div class="msg">Space: Play · P: Pause · F: Fullscreen</div>
-  <script type="module" src="./demo.js"></script>
+  <main>
+    <canvas id="c"></canvas>
+  </main>
+  <!-- сам скетч -->
+  <script type="module" src="../sketch.js"></script>
 </body>
 </html>
