@@ -25,8 +25,8 @@ The repository also includes:
 <!-- GALLERY:START -->
 | Preview | Title | Date |
 |---|---|---|
-| ![](sketches/2025-08-10_flow-fields/preview.png) | [Flow Fields](https://github.com/marjanblan/creative-coding/tree/main/sketches/2025-08-10_flow-fields) | 2025-08-10 |
-| ![](sketches/2025-08-09_looping-grid/preview.png) | [Looping Grid](https://github.com/marjanblan/creative-coding/tree/main/sketches/2025-08-09_looping-grid) | 2025-08-09 |
+| ![](sketches/2025-08-10_glitch/preview.png) | [Glitch](https://github.com/marjanblan/creative-coding/tree/main/sketches/2025-08-10_glitch) | 2025-08-10 |
+| ![](sketches/2025-08-09_shift/preview.png) | [Shift](https://github.com/marjanblan/creative-coding/tree/main/sketches/2025-08-09_shift) | 2025-08-09 |
 <!-- GALLERY:END -->
 
 ---
