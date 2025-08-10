@@ -67,7 +67,7 @@
 	 ctx.fillText('GLITCH', W / 2, H * 0.112);
  
 	 // NB: было чёрным — поэтому «пропадало», ставим фиолетовый
-	 ctx.fillStyle = '#9745FF';
+	 ctx.fillStyle = '#FFFFFF';
 	 ctx.font = `20px 'CoupeurCarve', sans-serif`;
 	 ctx.fillText('Issue 02', W * 0.515, H * 0.038);
  
@@ -116,7 +116,7 @@
 		   ctx.fill();
 		 } else {
 		   ctx.beginPath();
-		   ctx.arc(0, 0, radius, 0, Math.PI * 2);
+		   ctx.arc(0, 0, radius, 100, Math.PI * 2);
 		   ctx.fill();
 		 }
 		 ctx.restore();
