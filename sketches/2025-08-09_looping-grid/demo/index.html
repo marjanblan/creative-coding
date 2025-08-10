@@ -3,23 +3,18 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Looping Grid — Demo</title>
+  <title>Demo</title>
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      background: #0a0a0a;
-      height: 100%;
-      overflow: hidden;
-    }
-    canvas {
-      display: block;
-      margin: 0 auto;
-    }
+    :root { color-scheme: dark light; }
+    html, body { margin:0; height:100%; }
+    body { background:#0a0a0a; display:grid; place-items:center; }
+    canvas { display:block; width:min(100%, 1080px); height:auto; background:#000; border-radius:12px }
+    .msg { position:fixed; bottom:10px; left:50%; transform:translateX(-50%); opacity:.7; font:14px ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica Neue,Arial }
   </style>
 </head>
 <body>
   <canvas id="c"></canvas>
-  <script src="./demo.js"></script>
+  <div class="msg">Space: Play · P: Pause · F: Fullscreen</div>
+  <script type="module" src="./demo.js"></script>
 </body>
 </html>
