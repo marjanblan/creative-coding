@@ -2,8 +2,8 @@
   "title": "Glitch",
   "date": "2025-08-10",
   "tools": ["vanilla-canvas", "JavaScript"],
-  "tags": ["poster", "loop", "noise"],
-  "description": "Looping grid with subtle displacement and alternating shapes.",
+  "tags": ["poster", "loop", "noise", "grid"],
+  "description": "Issue 02. When Machines Dream in Noise.",
   "preview": "sketches/2025-08-10_glitch/preview.png",
   "repoPath": "https://github.com/marjanblan/creative-coding/tree/main/sketches/2025-08-10_glitch"
 }

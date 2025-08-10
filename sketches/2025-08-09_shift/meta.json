@@ -2,8 +2,8 @@
   "title": "Shift",
   "date": "2025-08-09",
   "tools": ["vanilla-canvas", "JavaScript"],
-  "tags": ["poster", "loop", "noise"],
-  "description": "A looping poster built with seeded random and loopable value-noise.",
+  "tags": ["poster", "loop", "noise", "grid"],
+  "description": "Issue 01. The Year Everything Moved.",
   "preview": "sketches/2025-08-09_shift/preview.png",
   "repoPath": "https://github.com/marjanblan/creative-coding/tree/main/sketches/2025-08-09_shift"
 }
