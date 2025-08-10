@@ -1,33 +1,37 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/bin/sh
+set -eu
+
+# В корень репо
 cd "$(git rev-parse --show-toplevel)"
-git pull --rebase origin main
+
+# Подтянуть удалённые изменения
+git pull --rebase origin main || true
+
+# Собрать список слугов (папки в sketches/, кроме _template)
+SLUGS=$(ls -1d sketches/*/ 2>/dev/null | sed -E 's#^sketches/([^/]+)/$#\1#' | grep -v '^_template$' || true)
+
+if [ -z "$SLUGS" ]; then
+  echo "⚠️  No sketches found."
+  exit 0
+fi
+
+# Перегенерим галерею
 npm run gallery
-mapfile -t SLUGS < <(git status --porcelain \
-  | awk '{print $2}' \
-  | grep -E '^sketches/[^/]+/' \
-  | cut -d'/' -f2 \
-  | grep -v '^_template$' \
-  | sort -u)
 
-if [ ${#SLUGS[@]} -eq 0 ]; then
-  echo "ℹ️ Нет локальных изменений в sketches/. Нечего деплоить."
-  exit 0
-fi
-
-echo "🧩 Найдены изменённые скетчи:"
-printf ' - %s\n' "${SLUGS[@]}"
-for s in "${SLUGS[@]}"; do
-  git add -A "sketches/$s"
+# Добавим все скетчи и служебные файлы
+for SLUG in $SLUGS; do
+  [ -d "sketches/$SLUG" ] && git add "sketches/$SLUG"
 done
-git add -A gallery.json README.md || true
+git add gallery.json README.md || true
 
+# Коммитим только если есть что коммитить
 if git diff --cached --quiet; then
-  echo "ℹ️ Нечего коммитить. Выходим."
-  exit 0
+  echo "ℹ️  Nothing to commit. Up to date."
+else
+  git commit -m "chore(deploy): deploy all sketches"
 fi
-MSG="chore(deploy): update sketches: ${SLUGS[*]}"
-git commit -m "$MSG"
+
+# Пуш
 git push origin main
-echo "✅ Deploy complete."
-echo "🌐 Site: https://marjanblan.github.io/creative-coding/"
+echo "✅ Deployed all sketches"
+echo "🌐 https://marjanblan.github.io/creative-coding/"
