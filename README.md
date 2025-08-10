@@ -23,7 +23,8 @@ The repository also includes:
 
 ## Gallery
 <!-- GALLERY:START -->
-*(The gallery will be generated automatically here by `npm run gallery`)*
+| Preview | Title | Date |
+|---|---|---|
 <!-- GALLERY:END -->
 
 ---
