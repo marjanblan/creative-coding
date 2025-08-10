@@ -109,9 +109,4 @@ const sketch = async () => {
   };
 };
 
-/* ---------- run (node vs browser) ---------- */
-const options = _hasRequire
-  ? settings
-  : { ...settings, canvas: document.getElementById('c') };
-
-canvasSketch(sketch, options);
+canvasSketch(sketch, { ...settings, canvas: document.getElementById('c') });
