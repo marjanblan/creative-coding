@@ -9,9 +9,10 @@
     "tags": [
       "poster",
       "loop",
-      "noise"
+      "noise",
+      "grid"
     ],
-    "description": "Looping grid with subtle displacement and alternating shapes.",
+    "description": "Issue 02. When Machines Dream in Noise.",
     "preview": "sketches/2025-08-10_glitch/preview.png",
     "repoPath": "https://github.com/marjanblan/creative-coding/tree/main/sketches/2025-08-10_glitch"
   },
@@ -25,9 +26,10 @@
     "tags": [
       "poster",
       "loop",
-      "noise"
+      "noise",
+      "grid"
     ],
-    "description": "A looping poster built with seeded random and loopable value-noise.",
+    "description": "Issue 01. The Year Everything Moved.",
     "preview": "sketches/2025-08-09_shift/preview.png",
     "repoPath": "https://github.com/marjanblan/creative-coding/tree/main/sketches/2025-08-09_shift"
   }
