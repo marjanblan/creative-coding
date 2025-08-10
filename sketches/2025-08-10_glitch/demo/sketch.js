@@ -67,10 +67,11 @@
 	 ctx.fillText('GLITCH', W / 2, H * 0.112);
  
 	 // NB: было чёрным — поэтому «пропадало», ставим фиолетовый
-	 ctx.fillStyle = '#FFFFFF';
+	 ctx.fillStyle = '#000000';
 	 ctx.font = `20px 'CoupeurCarve', sans-serif`;
 	 ctx.fillText('Issue 02', W * 0.515, H * 0.038);
- 
+    
+    ctx.fillStyle = '#9745FF';
 	 ctx.font = `20px 'CoupeurCarve', sans-serif`;
 	 ctx.fillText('When Machines Dream in Noise', W / 2, H * 0.95);
 	 ctx.restore();
@@ -116,7 +117,7 @@
 		   ctx.fill();
 		 } else {
 		   ctx.beginPath();
-		   ctx.arc(0, 0, radius, 100, Math.PI * 2);
+		   ctx.arc(0, 0, radius, 200, Math.PI * 2);
 		   ctx.fill();
 		 }
 		 ctx.restore();
