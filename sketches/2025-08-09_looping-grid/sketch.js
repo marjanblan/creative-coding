@@ -1,7 +1,19 @@
-const canvasSketch = window.canvasSketch;
-const random = window.canvasSketchUtil.random;
-const { mapRange } = window.canvasSketchUtil.math;
+/* --- universal imports (node + browser) --- */
+const _hasRequire = typeof require === 'function';
 
+const canvasSketch = _hasRequire
+  ? require('canvas-sketch')
+  : window.canvasSketch;
+
+const random = _hasRequire
+  ? require('canvas-sketch-util/random')
+  : window.canvasSketchUtil.random;
+
+const { mapRange } = _hasRequire
+  ? require('canvas-sketch-util/math')
+  : window.canvasSketchUtil.math;
+
+/* ---------- helpers ---------- */
 async function loadFont(name, url, descriptors = {}) {
   const font = new FontFace(name, `url(${url})`, descriptors);
   const loaded = await font.load();
@@ -9,6 +21,7 @@ async function loadFont(name, url, descriptors = {}) {
   await document.fonts.ready;
 }
 
+/* ---------- settings ---------- */
 const settings = {
   dimensions: [1080, 1350],
   animate: true,
@@ -18,17 +31,25 @@ const settings = {
   exportPixelRatio: 1
 };
 
+/* ---------- state ---------- */
 const SEED = 129;
 random.setSeed(SEED);
-const palette = ['#FF4B41', '#9745FF','#72F5A4', '#FFC0F0','#FFE64F'];
+const palette = ['#FF4B41', '#9745FF', '#72F5A4', '#FFC0F0', '#FFE64F'];
 
+/* ---------- sketch ---------- */
 const sketch = async () => {
-  await loadFont('CoupeurCarve', './demo/assets/fonts/CoupeurCarve-SemiBold.otf', { weight: '100 900' });
-  
+  // путь из sketches/<slug>/sketch.js в папку demo
+  await loadFont(
+    'CoupeurCarve',
+    './demo/assets/fonts/CoupeurCarve-SemiBold.otf',
+    { weight: '100 900' }
+  );
+
   return ({ context, width, height, playhead }) => {
     context.fillStyle = '#000';
     context.fillRect(0, 0, width, height);
 
+    // заголовки
     context.save();
     context.fillStyle = '#9745FF';
     context.textAlign = 'center';
@@ -45,6 +66,7 @@ const sketch = async () => {
     context.fillText('When Machines Dream in Noise', width / 2, height * 0.95);
     context.restore();
 
+    // сетка
     const cols = 64, rows = 120;
     const margin = width * 0.1;
     const gw = width - margin * 2;
@@ -59,10 +81,12 @@ const sketch = async () => {
       for (let x = 0; x < cols; x++) {
         const cx = margin + x * cw + cw / 2;
         const cy = margin + y * ch + ch / 2;
+
         const u = cols <= 1 ? 0.5 : x / (cols - 1);
         const v = rows <= 1 ? 0.5 : y / (rows - 1);
 
         const n = random.noise4D(u, v, Math.cos(angle), Math.sin(angle), 1.5, 1);
+
         const radius = cw * 0.2 * mapRange(n, -1, 1, 0.1, 2.4);
         const dx = mapRange(n, -1, 1, -cw * 0.1, cw * 0.1);
         const dy = mapRange(n, -1, 1, -ch * 0.1, ch * 0.1);
@@ -70,8 +94,7 @@ const sketch = async () => {
         const k = palette.length;
         const rowOffset = (4 * y) % k;
         const idx = (x + rowOffset) % k;
-        const color = palette[idx]; 
-        context.fillStyle = color;
+        context.fillStyle = palette[idx];
 
         context.save();
         context.translate(cx + dx, cy + dy);
@@ -96,4 +119,9 @@ const sketch = async () => {
   };
 };
 
-canvasSketch(sketch, { ...settings, canvas: document.getElementById('c') });  
+/* ---------- run (node vs browser) ---------- */
+const options = _hasRequire
+  ? settings
+  : { ...settings, canvas: document.getElementById('c') };
+
+canvasSketch(sketch, options);
