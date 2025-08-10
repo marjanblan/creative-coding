@@ -1,7 +1,0 @@
-{
-  "title": "Flow Fields",
-  "date": "2025-08-10",
-  "tools": ["canvas-sketch","JavaScript"],
-  "tags": ["flow-field","noise","print"],
-  "description": "Particle flow field with subtle color drift."
-}

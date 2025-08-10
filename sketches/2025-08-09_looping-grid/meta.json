@@ -1,7 +1,0 @@
-{
-  "title": "Looping Grid",
-  "date": "2025-08-09",
-  "tools": ["canvas-sketch", "JavaScript"],
-  "tags": ["loop", "grid", "animation"],
-  "description": "A seamless looping grid animation with shifting colors."
-}
