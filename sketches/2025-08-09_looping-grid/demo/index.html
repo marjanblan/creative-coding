@@ -3,23 +3,22 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Looping Grid — Demo</title>
+  <title>Looping Grid — Live Demo</title>
   <style>
-    html,body { margin:0; height:100%; background:#000; }
-    main { display:grid; place-items:center; height:100%; }
-    canvas { display:block; background:#000; }
+    :root { color-scheme: dark; }
+    html,body{height:100%;margin:0;background:#000}
+    main{min-height:100%;display:grid;place-items:center;padding:16px;box-sizing:border-box}
+    canvas{display:block;background:#000;max-width:min(92vw,1080px);width:100%;height:auto;border-radius:12px}
+    .note{position:fixed;inset:auto 16px 16px auto;opacity:.5;font:12px ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:#aaa}
   </style>
-
-  <!-- локальные копии UMD-библиотек -->
-  <script src="./libs/canvas-sketch.umd.js"></script>
-  <script src="./libs/canvas-sketch-util.min.js"></script>
-
-  <!-- твой скетч. Внутри он использует window.canvasSketch и window.canvasSketchUtil -->
- <script src="./sketch.js"></script>
 </head>
 <body>
   <main>
-    <canvas id="c"></canvas>
+    <canvas id="c" width="1080" height="1350"></canvas>
+    <div class="note">Vanilla runtime (no deps)</div>
   </main>
+  <!-- Никаких модулей, просто локальный файл -->
+  <script defer src="./sketch.js"></script>
 </body>
 </html>
+  
