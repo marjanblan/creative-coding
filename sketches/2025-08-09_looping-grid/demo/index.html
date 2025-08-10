@@ -3,21 +3,23 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>GLITCH Demo</title>
+  <title>Looping Grid — Demo</title>
   <style>
     html,body { margin:0; height:100%; background:#000; }
     main { display:grid; place-items:center; height:100%; }
     canvas { display:block; background:#000; }
   </style>
 
-  <!-- Локальные UMD: от demo -> ../../../site/libs/... -->
-  <script src="../../../site/libs/canvas-sketch.umd.js"></script>
-  <script src="../../../site/libs/canvas-sketch-util.min.js"></script>
+  <!-- локальные копии UMD-библиотек -->
+  <script src="../../../site/libs/canvas-sketch.umd.js" defer></script>
+  <script src="../../../site/libs/canvas-sketch-util.min.js" defer></script>
+
+  <!-- твой скетч. Внутри он использует window.canvasSketch и window.canvasSketchUtil -->
+  <script src="../sketch.js" defer></script>
 </head>
 <body>
-  <main><canvas id="c"></canvas></main>
-
-  <!-- Твой скетч (использует window.canvasSketch / window.canvasSketchUtil) -->
-  <script src="../sketch.js"></script>
+  <main>
+    <canvas id="c"></canvas>
+  </main>
 </body>
 </html>
