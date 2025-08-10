@@ -25,6 +25,14 @@ async function main() {
       el.appendChild(img);
       el.appendChild(meta);
       grid.appendChild(el);
+
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(6px)';
+      requestAnimationFrame(() => {
+        el.style.transition = 'opacity .25s ease, transform .25s ease';
+        el.style.opacity = '1';
+        el.style.transform = 'translateY(0)';
+      });
     }
   } catch (e) {
     console.error('Failed to load gallery.json', e);
