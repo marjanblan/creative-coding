@@ -1,6 +1,6 @@
 async function main() {
   try {
-    const res = await fetch('../gallery.json', { cache: 'no-store' });
+    const res = await fetch('./gallery.json', { cache: 'no-store' });
     const items = await res.json();
     const grid = document.getElementById('grid');
 
