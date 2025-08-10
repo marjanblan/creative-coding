@@ -1,159 +1,181 @@
-/**
- * SHIFT — generative poster
- * Author: Ruslan Mashkov (@marjanblan)
- * Runtime: vanilla canvas + seeded random + loopable value noise
- * Notes: no external libs; works on GitHub Pages / any static hosting
+/* SHIFT — live-view browser build (no canvas-sketch)
+ * Author: Ruslan Mashkov
+ * Notes: 1080×1350 logical size, DPR-aware render, auto-fit to window.
+ * Controls: window.player.play(), window.player.pause(); Space toggles.
  */
 
-const $ = s => document.querySelector(s);
-const canvas = $('#c');
-const ctx = canvas.getContext('2d', { alpha: false });
+(async function () {
+  // ---------- setup ----------
+  const LOGICAL_W = 1080;
+  const LOGICAL_H = 1350;
+  const LOOP_SEC = 12;
+  const FPS = 24;               // только для подсказки, рендер — rAF
+  const FONT_URL = './assets/fonts/CoupeurCarve-SemiBold.otf';
 
-/* ---------- canvas sizing (CSS px, DPR safe) ---------- */
-function fitCanvas() {
-  const parent = canvas.parentElement;
-  const cssW = parent.clientWidth;
-  const cssH = parent.clientHeight;
-  const dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
-  canvas.width = Math.round(cssW * dpr);
-  canvas.height = Math.round(cssH * dpr);
-  canvas.style.width = cssW + 'px';
-  canvas.style.height = cssH + 'px';
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-}
-window.addEventListener('resize', fitCanvas);
+  const PALETTE = ['#FF4B41', '#9745FF', '#72F5A4', '#FFC0F0', '#FFE64F'];
+  const SEED = 128; // фиксируем «случайность»
 
-/* ---------- time / controls ---------- */
-let running = true;
-let t0 = performance.now();
-let last = t0;
-let elapsed = 0;
-const settings = { animate: true, duration: 12, fps: 60 };
-$('#btnPlay').onclick  = () => { if (!running) { running = true; last = performance.now(); requestAnimationFrame(loop); } };
-$('#btnPause').onclick = () => { running = false; };
-$('#btnFS').onclick    = () => document.documentElement.requestFullscreen?.();
+  // canvas
+  const canvas = document.getElementById('c') || document.querySelector('canvas') || (() => {
+    const el = document.createElement('canvas');
+    document.body.appendChild(el);
+    return el;
+  })();
+  const ctx = canvas.getContext('2d', { alpha: false });
 
-/* ---------- seeded random + light value-noise ---------- */
-let SEED = 128;
-function mulberry32(a){return function(){let t=(a+=0x6D2B79F5)|0;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return ((t^(t>>>14))>>>0)/4294967296;}}
-const rnd = mulberry32(SEED);
+  // стили: без скролла, вписываемся в окно
+  Object.assign(document.documentElement.style, { height: '100%' });
+  Object.assign(document.body.style, {
+    margin: 0,
+    height: '100%',
+    background: '#111'
+  });
+  Object.assign(canvas.style, {
+    display: 'block',
+    maxWidth: '100%',
+    maxHeight: '100%',
+    objectFit: 'contain',
+    margin: '0 auto'
+  });
 
-function hash(x, y) {
-  let t = x * 374761393 + y * 668265263 + (SEED|0)*1442695041;
-  t = (t ^ (t >> 13)) * 1274126177;
-  return ((t ^ (t >> 16)) >>> 0) / 4294967295;
-}
-function lerp(a,b,t){return a + (b-a)*t;}
-function smooth(t){return t*t*(3-2*t);}
-function noise2D(x, y) {
-  const x0 = Math.floor(x), y0 = Math.floor(y);
-  const x1 = x0 + 1,        y1 = y0 + 1;
-  const sx = smooth(x - x0);
-  const sy = smooth(y - y0);
-  const n00 = hash(x0,y0), n10 = hash(x1,y0);
-  const n01 = hash(x0,y1), n11 = hash(x1,y1);
-  const nx0 = lerp(n00,n10,sx);
-  const nx1 = lerp(n01,n11,sx);
-  return lerp(nx0,nx1,sy) * 2 - 1; // [-1..1]
-}
-function loopNoise(u, v, playhead, scale=1.5) {
-  const a = Math.cos(playhead * 2*Math.PI);
-  const b = Math.sin(playhead * 2*Math.PI);
-  return 0.5 * (noise2D(u*scale + a, v*scale + b) + noise2D(u*scale - b, v*scale + a));
-}
-function mapRange(v,a,b,c,d){return c + (v - a) * (d - c) / (b - a);}
+  // шрифт
+  await loadFont('CoupeurCarve', FONT_URL, { weight: '100 900' });
 
-/* ---------- font ---------- */
-async function loadFont(name, url, desc={}) {
-  const f = new FontFace(name, `url(${url})`, desc);
-  await f.load(); document.fonts.add(f); await document.fonts.ready;
-}
+  // «рандом» через сид (мини-реализация только для noise4D не нужна — здесь не используем)
+  // Для SHIFT — без шумов в тексте, шум только для точек (см. ниже).
 
-/* ---------- the sketch (canvas-sketch–like API) ---------- */
-const palette = ['#FF4B41', '#9745FF', '#72F5A4', '#FFC0F0', '#FFE64F'];
+  // ресайз под DPR
+  function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    // вписываем «логический» холст в окно, сохраняя пропорции
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const scale = Math.min(vw / LOGICAL_W, vh / LOGICAL_H);
 
-async function create() {
-  await loadFont('CoupeurCarve', './assets/fonts/CoupeurCarve-SemiBold.otf', { weight: '100 900' });
+    const cssW = Math.floor(LOGICAL_W * scale);
+    const cssH = Math.floor(LOGICAL_H * scale);
 
-  return ({ context, width, height, playhead }) => {
-    // background
-    context.fillStyle = '#000';
-    context.fillRect(0,0,width,height);
+    canvas.width = Math.floor(cssW * dpr);
+    canvas.height = Math.floor(cssH * dpr);
+    canvas.style.width = cssW + 'px';
+    canvas.style.height = cssH + 'px';
 
-    // header
-    context.save();
-    context.fillStyle = '#FF4B41';
-    context.textAlign = 'center';
-    context.textBaseline = 'middle';
-    context.font = `100 ${Math.round(width * 0.2)}px 'CoupeurCarve', sans-serif`;
-    context.fillText('SHIFT', width/2, height*0.112);
-    context.font = `20px 'CoupeurCarve', sans-serif`;
-    context.fillText('Issue 01', width * 0.643, height * 0.064);
-    context.fillText('The Year Everything Moved', width/2, height*0.95);
-    context.restore();
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // чтобы рисовать в CSS‑координатах
+  }
+  window.addEventListener('resize', resize);
+  resize();
 
-    // grid
-    const cols = 48, rows = 48;
+  // ----------- рендер одного кадра -----------
+  function render(playhead) {
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+
+    // фон
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, width, height);
+
+    // заголовки
+    ctx.save();
+    ctx.fillStyle = '#FF4B41';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = `100 ${Math.round(width * (LOGICAL_W ? 0.2 * (width / LOGICAL_W) : 0.2))}px 'CoupeurCarve', sans-serif`;
+    ctx.fillText('SHIFT', width / 2, height * 0.112);
+
+    ctx.fillStyle = '#FF4B41';
+    ctx.font = `20px 'CoupeurCarve', sans-serif`;
+    ctx.fillText('Issue 01', width * 0.643, height * 0.064);
+
+    ctx.font = `20px 'CoupeurCarve', sans-serif`;
+    ctx.fillText('The Year Everything Moved', width / 2, height * 0.95);
+    ctx.restore();
+
+    // сетка точек
+    const cols = 48;
+    const rows = 48;
     const margin = width * 0.1;
-    const gw = width - margin*2;
-    const gh = height - margin*2;
+    const gw = width - margin * 2;
+    const gh = height - margin * 2;
     const cw = gw / cols;
     const ch = gh / rows;
 
-    const anglePlay = playhead; // 0..1
+    const angle = playhead * Math.PI * 2; // 0..1 → 0..2π
 
-    for (let y=0; y<rows; y++){
-      for (let x=0; x<cols; x++){
-        const cx = margin + x*cw + cw/2;
-        const cy = margin + y*ch + ch/2;
+    for (let y = 0; y < rows; y++) {
+      for (let x = 0; x < cols; x++) {
+        // центр ячейки
+        const cx = margin + x * cw + cw / 2;
+        const cy = margin + y * ch + ch / 2;
 
-        const u = cols<=1 ? 0.5 : x/(cols-1);
-        const v = rows<=1 ? 0.5 : y/(rows-1);
+        // простая «пульсация» вместо noise4D (для стабильности без canvas-sketch)
+        const wave = Math.sin(angle + x * 0.15 + y * 0.12);
+        const radius = cw * 0.22 * mapRange(wave, -1, 1, 0.2, 2.0);
 
-        const n = loopNoise(u, v, anglePlay, 1.5);
-        const radius = cw * 0.5 * mapRange(n, -1, 1, 0.1, 2.4);
-        const dx = mapRange(n, -1, 1, -cw*0.1, cw*0.1);
-        const dy = mapRange(n, -1, 1, -ch*0.1, ch*0.1);
+        // цвет — «сдвиг по строкам»
+        const k = PALETTE.length;
+        const rowOffset = (3 * y) % k;
+        const idx = (x + rowOffset) % k;
+        ctx.fillStyle = PALETTE[idx];
 
-        const rowOffset = (3*y) % palette.length;
-        const idx = (x + rowOffset) % palette.length;
-        context.fillStyle = palette[idx];
-
-        context.save();
-        context.translate(cx + dx, cy + dy);
-
-        const s = loopNoise(u+5, v+5, anglePlay, 3.0);
-        if (s > 0) {
-          const size = radius * 1.4;
-          context.beginPath();
-          context.rect(-size/2, -size/2, size, size);
-          context.fill();
-        } else {
-          context.beginPath();
-          context.arc(0,0,radius,0,Math.PI*2);
-          context.fill();
-        }
-        context.restore();
+        // рисуем круг
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+        ctx.fill();
       }
     }
+  }
+
+  // ---------- хелперы ----------
+  function mapRange(n, a, b, c, d) {
+    return ((n - a) / (b - a)) * (d - c) + c;
+  }
+
+  async function loadFont(name, url, descriptors = {}) {
+    const ff = new FontFace(name, `url(${url})`, descriptors);
+    await ff.load();
+    document.fonts.add(ff);
+    await document.fonts.ready;
+  }
+
+  // ---------- цикл / управление ----------
+  let running = true;
+  let t0 = performance.now();
+
+  function frame(now) {
+    if (!running) return;
+    const elapsed = (now - t0) / 1000;
+    const playhead = (elapsed % LOOP_SEC) / LOOP_SEC; // 0..1
+    render(playhead);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  // публичные контролы (кнопки в твоём live-view могут дергать это)
+  window.player = {
+    play() {
+      if (!running) {
+        running = true;
+        t0 = performance.now();
+        requestAnimationFrame(frame);
+      }
+    },
+    pause() { running = false; }
   };
-}
 
-/* ---------- runtime ---------- */
-function loop(ts){
-  if (!running) return;
-  const dt = (ts - last)/1000; last = ts;
-  if (settings.animate) elapsed = (ts - t0)/1000;
-  const width = canvas.clientWidth, height = canvas.clientHeight;
-  const playhead = settings.duration>0 ? (elapsed % settings.duration)/settings.duration : 0;
-  render?.({ context: ctx, width, height, playhead, time: elapsed, delta: dt });
-  requestAnimationFrame(loop);
-}
+  // Space = toggle
+  window.addEventListener('keydown', (e) => {
+    if (e.code === 'Space') {
+      e.preventDefault();
+      running ? window.player.pause() : window.player.play();
+    }
+  });
 
-let render;
-(async function init(){
-  fitCanvas();
-  render = await create();
-  last = performance.now();
-  requestAnimationFrame(loop);
+  // если в разметке есть кнопки с data-action, подцепимся
+  bindButtons();
+  function bindButtons() {
+    const playBtn = document.querySelector('[data-action="play"], #btnPlay');
+    const pauseBtn = document.querySelector('[data-action="pause"], #btnPause');
+    if (playBtn) playBtn.onclick = () => window.player.play();
+    if (pauseBtn) pauseBtn.onclick = () => window.player.pause();
+  }
 })();
