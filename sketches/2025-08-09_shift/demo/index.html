@@ -25,5 +25,41 @@
     <div class="stage"><canvas id="c"></canvas></div>
   </main>
   <script type="module" src="./sketch.js"></script>
+  <style>
+    body.external-view button[aria-label="Play"],
+    body.external-view button[aria-label="Pause"] {
+      display: none;
+    }
+  </style>
+  <script>
+    // Определяем, если открыли демо в отдельной вкладке (не в iframe)
+    if (window.self === window.top) {
+      document.body.classList.add('external-view');
+    }
+  </script>
+  <script>
+    // Управление с клавиатуры
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'Space') {
+        e.preventDefault();
+        const btn = document.querySelector('button[aria-label="Pause"]') || document.querySelector('button[aria-label="Play"]');
+        if (btn) btn.click();
+      }
+      if (e.code === 'KeyF') {
+        e.preventDefault();
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen();
+        } else {
+          document.exitFullscreen();
+        }
+      }
+    });
+  </script>
+  <script>
+    window.addEventListener('load', () => {
+      const canvas = document.querySelector('canvas');
+      if (canvas) canvas.focus();
+    });
+  </script>
 </body>
 </html>
