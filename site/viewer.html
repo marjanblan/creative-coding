@@ -1,28 +1,76 @@
-<!-- site/viewer.html -->
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Sketch Viewer</title>
-  <link rel="stylesheet" href="./styles.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sketch — Viewer</title>
+  <link rel="stylesheet" href="./styles.css">
   <style>
-    .viewer { display:grid; grid-template-columns: 1fr; gap:24px; margin-top:24px; }
-    .viewer .toolbar { display:flex; gap:8px; flex-wrap:wrap; }
-    .btn { padding:10px 14px; border-radius:10px; background:#111; color:#fff; text-decoration:none; border:0; cursor:pointer; }
-    .btn.ghost { background:#fff; border:1px solid #ddd; color:#111; }
-    @media (prefers-color-scheme: dark) {
-      .btn.ghost { background:#151518; border:1px solid #2a2a2f; color:#e7e7ea; }
-    }
-    iframe { width:100%; height:70vh; border:0; border-radius:16px; background:#eee; }
-    .viewer img { width:100%; max-width:1000px; border-radius:16px; background:#eee; display:block; }
+    /* чуть подправим локально */
+    .toolbar { display:flex; gap:12px; align-items:center; margin:8px 0 16px; }
+    .stage   { background:#0c0c0f; border-radius:16px; padding:16px; }
+    .stage .frame { aspect-ratio: 16/9; width:100%; background:#000; border-radius:12px; display:grid; place-items:center; }
+    .stage img { width:100%; max-height:65vh; object-fit:contain; border-radius:12px; background:#000; }
+    .title { font-size:28px; margin:16px 0 6px; }
+    .sub   { opacity:.6; font-size:13px; }
+    .desc  { margin-top:12px; opacity:.85; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <a href="./" style="opacity:.7">&larr; Back to gallery</a>
-    <section id="viewer" class="viewer"></section>
-  </div>
-  <script type="module" src="./viewer.js"></script>
+  <main class="container">
+    <a href="./" class="back">← Back to gallery</a>
+
+    <div class="toolbar">
+      <a id="openPreview" class="btn">Open live demo</a>
+      <a id="openGH" class="btn">Open on GitHub</a>
+    </div>
+
+    <section class="stage">
+      <div class="frame">
+        <img id="preview" alt="Preview"/>
+      </div>
+    </section>
+
+    <h1 id="title" class="title"></h1>
+    <div id="meta" class="sub"></div>
+    <p id="desc" class="desc"></p>
+  </main>
+
+  <script>
+    (async function () {
+      const params = new URLSearchParams(location.search);
+      const slug = params.get('slug');                 // например: 2025-08-09_looping-grid
+      if (!slug) return;
+
+      // грузим метаданные
+      const res = await fetch('./gallery.json', { cache: 'no-store' });
+      const items = await res.json();
+
+      // находим пункт по slug: в preview всегда есть "sketches/<slug>/preview.png"
+      const item = items.find(it => it.preview.includes(`/sketches/${slug}/`));
+      const openPreview = document.getElementById('openPreview');
+      const openGH = document.getElementById('openGH');
+      const img = document.getElementById('preview');
+
+      // ссылки
+      openPreview.href = `./sketches/${slug}/demo/index.html`;
+      openPreview.target = '_blank';
+      openGH.href = item ? item.repoPath : '#';
+      openGH.target = '_blank';
+
+      // превью и тексты
+      if (item) {
+        img.src = item.preview;
+        img.alt = item.title;
+        document.getElementById('title').textContent = item.title;
+        document.getElementById('meta').textContent =
+          `${new Date(item.date).toLocaleDateString()} · ${item.tools.join(', ')}`;
+        document.getElementById('desc').textContent = item.description || '';
+      } else {
+        img.src = `./sketches/${slug}/preview.png`; // запасной путь
+        document.getElementById('title').textContent = slug.replace(/_/g,' ');
+      }
+    })();
+  </script>
 </body>
 </html>
