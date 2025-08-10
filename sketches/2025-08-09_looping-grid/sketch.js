@@ -4,6 +4,8 @@ const rnd = window.canvasSketchUtil.random;
 const { mapRange } = window.canvasSketchUtil.math;
 
 console.log('[sketch] file loaded', !!CS, !!rnd);
+console.log('[sketch] file loaded');
+window.addEventListener('DOMContentLoaded', () => console.log('[sketch] DOM ready'));
 
 const settings = {
   dimensions: [1080, 1350],
