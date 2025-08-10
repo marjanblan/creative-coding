@@ -1,13 +1,35 @@
 :root { --gap: 24px; }
+@media (prefers-color-scheme: dark) {
+  :root { color-scheme: dark; }
+  body { background: #0e0e10; color: #e7e7ea; }
+  .card { background:#151518; box-shadow: 0 2px 16px rgba(0,0,0,.35); }
+  .card:hover { box-shadow: 0 8px 28px rgba(0,0,0,.6); }
+  .card img { background: #222; }
+  .sub { opacity: .8; }
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: var(--gap);
   margin-top: 24px;
 }
-.card { border-radius: 16px; overflow: hidden; background:#fff; box-shadow: 0 2px 16px rgba(0,0,0,.06); transition: transform .2s ease, box-shadow .2s ease; }
+
+.card { 
+  border-radius: 16px; 
+  overflow: hidden; 
+  background:#fff; 
+  box-shadow: 0 2px 16px rgba(0,0,0,.06); 
+  transition: transform .2s ease, box-shadow .2s ease; 
+}
 .card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,0,0,.12); }
 .card img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; display:block; background: #eee; }
-.meta { padding: 16px; }
-.meta .title { margin: 0 0 6px; font-size: 18px; }
+.card .meta { padding: 16px; }
+.card .title { margin: 0 0 6px; font-size: 18px; }
+.card a { text-decoration: none; color: inherit; }
+.card:hover a { cursor: pointer; }
 .sub { font-size: 12px; opacity: .65; display:flex; gap:8px; flex-wrap: wrap; }
+
+@media (prefers-reduced-motion: reduce) {
+  .card, .card:hover { transition: none; transform: none; box-shadow: 0 2px 16px rgba(0,0,0,.06); }
+}
