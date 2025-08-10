@@ -25,6 +25,7 @@ The repository also includes:
 <!-- GALLERY:START -->
 | Preview | Title | Date |
 |---|---|---|
+| ![](sketches/2025-08-09_looping-grid/preview.png) | [Looping Grid](https://github.com/marjanblan/creative-coding/tree/main/sketches/2025-08-09_looping-grid) | 2025-08-09 |
 <!-- GALLERY:END -->
 
 ---

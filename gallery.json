@@ -1,1 +1,18 @@
-[]
+[
+  {
+    "title": "Looping Grid",
+    "date": "2025-08-09",
+    "tools": [
+      "canvas-sketch",
+      "JavaScript"
+    ],
+    "tags": [
+      "loop",
+      "grid",
+      "animation"
+    ],
+    "description": "A seamless looping grid animation with shifting colors.",
+    "preview": "sketches/2025-08-09_looping-grid/preview.png",
+    "repoPath": "https://github.com/marjanblan/creative-coding/tree/main/sketches/2025-08-09_looping-grid"
+  }
+]
