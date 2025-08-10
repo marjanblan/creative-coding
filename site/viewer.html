@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sketch Viewer</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <style>
+    .viewer { display:grid; grid-template-columns: 1fr; gap:24px; margin-top:24px; }
+    .viewer img { width:100%; max-width:1000px; border-radius:16px; background:#eee; display:block; }
+    .viewer .meta { padding:0; }
+    .viewer .title { font-size: clamp(22px, 3vw, 32px); margin:0 0 8px; }
+    .viewer .sub  { margin-bottom:12px; }
+    .actions { display:flex; gap:12px; flex-wrap:wrap; margin-top:8px; }
+    .btn { padding:10px 14px; border-radius:10px; background:#111; color:#fff; text-decoration:none; }
+    .btn.ghost { background:#fff; border:1px solid #ddd; color:#111; }
+    @media (prefers-color-scheme: dark) {
+      .btn.ghost { background:#151518; border:1px solid #2a2a2f; color:#e7e7ea; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="./" style="opacity:.7">&larr; Back to gallery</a>
+    <section id="viewer" class="viewer"></section>
+  </div>
+  <script type="module" src="./viewer.js"></script>
+</body>
+</html>
