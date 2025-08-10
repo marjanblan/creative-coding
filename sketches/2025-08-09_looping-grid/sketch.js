@@ -23,7 +23,7 @@ random.setSeed(SEED);
 const palette = ['#FF4B41', '#9745FF','#72F5A4', '#FFC0F0','#FFE64F'];
 
 const sketch = async () => {
-  await loadFont('CoupeurCarve', './assets/fonts/CoupeurCarve-SemiBold.otf', { weight: '100 900' });
+  await loadFont('CoupeurCarve', './demo/assets/fonts/CoupeurCarve-SemiBold.otf', { weight: '100 900' });
   
   return ({ context, width, height, playhead }) => {
     context.fillStyle = '#000';
@@ -96,4 +96,4 @@ const sketch = async () => {
   };
 };
 
-canvasSketch(sketch, { ...settings, canvas: document.getElementById('c') });
+canvasSketch(sketch, { ...settings, canvas: document.getElementById('c') });  

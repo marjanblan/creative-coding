@@ -9,16 +9,26 @@
     main { display: grid; place-items: center; height: 100%; }
     canvas { display: block; background: #000; }
   </style>
+
   <!-- UMD билды -->
   <script src="https://unpkg.com/canvas-sketch@0.7.7/dist/canvas-sketch.umd.js"></script>
   <script src="https://unpkg.com/canvas-sketch-util@1.10.0/build/canvas-sketch-util.min.js"></script>
-  
-  <!-- Простой shim для require() -->
+
+  <!-- Shim для CommonJS require() -->
   <script>
     window.require = (name) => {
-      if (name === 'canvas-sketch') return window.canvasSketch;
-      if (name === 'canvas-sketch-util/random') return window.canvasSketchUtil.random;
-      if (name === 'canvas-sketch-util/math') return window.canvasSketchUtil.math;
+      if (name === 'canvas-sketch') {
+        // на всякий случай берём default, если UMD так экспортирует
+        return (window.canvasSketch && (window.canvasSketch.default || window.canvasSketch));
+      }
+      if (name === 'canvas-sketch-util/random') {
+        const u = window.canvasSketchUtil;
+        return u && u.random;
+      }
+      if (name === 'canvas-sketch-util/math') {
+        const u = window.canvasSketchUtil;
+        return u && u.math;
+      }
       throw new Error('Unknown module: ' + name);
     };
   </script>
@@ -27,7 +37,8 @@
   <main>
     <canvas id="c"></canvas>
   </main>
-  <!-- сам скетч -->
-  <script type="module" src="../sketch.js"></script>
+
+  <!-- ВАЖНО: без type="module", чтобы сработал require(...) -->
+  <script src="../sketch.js"></script>
 </body>
 </html>
