@@ -1,3 +1,21 @@
+#!/bin/bash
+set -e
+
+echo "🔎 Git status (before):"
+git status --short
+
+# --- Auto-commit local changes before pulling ---
+if [ -n "$(git status --porcelain)" ]; then
+  echo "💾 Staging local changes..."
+  git add -A
+  git commit -m "auto: save local changes before sync" || true
+fi
+
+# --- Pull latest changes with rebase ---
+echo "⬇️  Pull (rebase)..."
+git pull --rebase origin main
+
+echo "✅ Sync complete!"
 #!/usr/bin/env bash
 set -euo pipefail
 echo "🔎 Git status (before):"
