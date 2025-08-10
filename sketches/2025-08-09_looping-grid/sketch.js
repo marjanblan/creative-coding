@@ -1,17 +1,7 @@
 /* --- universal imports (node + browser) --- */
-const _hasRequire = typeof require === 'function';
-
-const canvasSketch = _hasRequire
-  ? require('canvas-sketch')
-  : window.canvasSketch;
-
-const random = _hasRequire
-  ? require('canvas-sketch-util/random')
-  : window.canvasSketchUtil.random;
-
-const { mapRange } = _hasRequire
-  ? require('canvas-sketch-util/math')
-  : window.canvasSketchUtil.math;
+const canvasSketch = window.canvasSketch;
+const random = window.canvasSketchUtil.random;
+const { mapRange } = window.canvasSketchUtil.math;
 
 /* ---------- helpers ---------- */
 async function loadFont(name, url, descriptors = {}) {
@@ -41,7 +31,7 @@ const sketch = async () => {
   // путь из sketches/<slug>/sketch.js в папку demo
   await loadFont(
     'CoupeurCarve',
-    './demo/assets/fonts/CoupeurCarve-SemiBold.otf',
+    './assets/fonts/CoupeurCarve-SemiBold.otf',
     { weight: '100 900' }
   );
 

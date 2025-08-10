@@ -10,37 +10,31 @@
     canvas { display:block; background:#000; }
   </style>
 
-  <!-- UMD builds (дают window.canvasSketch и window.canvasSketchUtil) -->
-  <script src="https://unpkg.com/canvas-sketch@0.7.7/dist/canvas-sketch.umd.js"></script>
-  <script src="https://unpkg.com/canvas-sketch-util@1.10.0/build/canvas-sketch-util.min.js"></script>
-  
-  <!-- Ждём, пока UMDы точно появятся в window, и только потом подключаем скетч -->
+  <!-- UMD -->
+  <script src="https://unpkg.com/canvas-sketch@0.7.7/dist/canvas-sketch.umd.js"
+          onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/canvas-sketch@0.7.7/dist/canvas-sketch.umd.js'"></script>
+  <script src="https://unpkg.com/canvas-sketch-util@1.10.0/build/canvas-sketch-util.min.js"
+          onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/canvas-sketch-util@1.10.0/build/canvas-sketch-util.min.js'"></script>
+
   <script>
     (function waitForLibs() {
-      const ok =
-        window.canvasSketch &&
-        window.canvasSketchUtil &&
-        window.canvasSketchUtil.random &&
-        window.canvasSketchUtil.math;
-  
+      const ok = window.canvasSketch &&
+                 window.canvasSketchUtil &&
+                 window.canvasSketchUtil.random &&
+                 window.canvasSketchUtil.math;
       if (ok) {
         const s = document.createElement('script');
-        s.src = '../sketch.js';            // без type="module"
+        s.src = '../sketch.js';      // без type="module"
         document.body.appendChild(s);
       } else {
         setTimeout(waitForLibs, 50);
       }
     })();
   </script>
-        
 </head>
 <body>
   <main>
     <canvas id="c"></canvas>
   </main>
-
-  <!-- просто запускаем твой скетч -->
-  <script src="../sketch.js"></script>
 </body>
 </html>
-    
