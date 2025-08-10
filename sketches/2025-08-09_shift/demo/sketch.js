@@ -124,7 +124,21 @@
        }
      }
  
-     requestAnimationFrame(frame);
+     let playing = true;
+     function loop() {
+       if (!playing) return;
+       // ... твой кадр ...
+       requestAnimationFrame(loop);
+     }
+     
+     // старт
+     requestAnimationFrame(loop);
+     
+     // экспорт управления для index.html
+     window.__demo = {
+       play()  { if (!playing) { playing = true;  requestAnimationFrame(loop); } },
+       pause() { playing = false; }
+     };
    })(t0);
  
    // UI

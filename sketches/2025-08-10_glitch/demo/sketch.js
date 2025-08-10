@@ -124,7 +124,21 @@
 	   }
 	 }
  
-	 requestAnimationFrame(frame);
+	 let playing = true;
+    function loop() {
+      if (!playing) return;
+      // ... твой кадр ...
+      requestAnimationFrame(loop);
+    }
+    
+    // старт
+    requestAnimationFrame(loop);
+    
+    // экспорт управления для index.html
+    window.__demo = {
+      play()  { if (!playing) { playing = true;  requestAnimationFrame(loop); } },
+      pause() { playing = false; }
+    };
    })(t0);
  
    document.getElementById('btnPlay')?.addEventListener('click', () => (playing = true, start()));
@@ -133,5 +147,5 @@
  
  (async () => {
    await loadFont('CoupeurCarve', './assets/fonts/CoupeurCarve-SemiBold.otf', { weight: '100 900' });
-   start();
+   start(); 
  })();
