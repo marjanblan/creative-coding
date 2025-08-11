@@ -13,53 +13,17 @@
     main { display:grid; place-items:center; padding:16px; }
     .stage { width:min(1200px, 100%); aspect-ratio:4/5; background:#111; border-radius:16px; display:grid; place-items:center; }
     canvas { max-width:100%; max-height:100%; background:#000; border-radius:12px; display:block; }
-    /* прячем play/pause, если открыто не в iframe */
-    body.external-view button[aria-label="Play"],
-    body.external-view button[aria-label="Pause"] { display:none; }
   </style>
 </head>
 <body>
   <div class="bar">
-    <button id="btnPlay"  aria-label="Play">Play</button>
-    <button id="btnPause" aria-label="Pause">Pause</button>
-    <button id="btnFS"    aria-label="Fullscreen">Fullscreen</button>
+    <button id="btnPlay">Play</button>
+    <button id="btnPause">Pause</button>
+    <button id="btnFS">Fullscreen</button>
   </div>
-
   <main>
     <div class="stage"><canvas id="c"></canvas></div>
   </main>
-
-  <!-- твой скетч -->
-  <script type="module" src="./sketch.js"></script>
-
-  <script>
-    // если открыто в отдельной вкладке (не в iframe) — скрываем play/pause
-    if (window.self === window.top) {
-      document.body.classList.add('external-view');
-    }
-
-    // Горячие клавиши: Space = Play/Pause, F = Fullscreen
-    document.addEventListener('keydown', (e) => {
-      if (e.code === 'Space') {
-        e.preventDefault();
-        // нажмём «Pause», если есть; иначе «Play»
-        const btn = document.querySelector('button[aria-label="Pause"]') || document.querySelector('button[aria-label="Play"]');
-        btn?.click();
-      }
-      if (e.code === 'KeyF') {
-        e.preventDefault();
-        if (!document.fullscreenElement) document.documentElement.requestFullscreen();
-        else document.exitFullscreen();
-      }
-    });
-
-    // Автофокус на канвас (для мгновенных хоткеев)
-    window.addEventListener('load', () => document.getElementById('c')?.focus());
-
-    // Проводка кнопок (ожидаем, что скетч выставит window.__demo.play/pause)
-    btnPlay.onclick  = () => window.__demo?.play?.();
-    btnPause.onclick = () => window.__demo?.pause?.();
-    btnFS.onclick    = () => (!document.fullscreenElement ? document.documentElement.requestFullscreen() : document.exitFullscreen());
-  </script>
+  <script src="./sketch.js"></script>
 </body>
 </html>
