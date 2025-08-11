@@ -101,7 +101,7 @@
  
          const sn = noise4D(u + 5, v + 5, Math.cos(angle) * 2, Math.sin(angle) * 2);
          if (sn > 0) {
-           const s = radius * 1.4;
+           const s = radius * 0.8;
            ctx.beginPath();
            ctx.rect(-s / 2, -s / 2, s, s);
            ctx.fill();
