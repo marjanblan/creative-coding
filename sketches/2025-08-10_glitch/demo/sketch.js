@@ -3,33 +3,19 @@
  * Notes: 1080×1350, DPR-aware render, auto-fit, smooth loop.
  */
 
- // GLITCH — браузерная версия с тем же поведением, что и canvas-sketch
+
  import { makeNoise4D } from './noise.js';
  
- const settings = {
-   dimensions: [1080, 1350],
-   animate: true,
-   duration: 12,
-   fps: 24,
-   pixelsPerInch: 72,
-   exportPixelRatio: 1
- };
- 
+ const settings = { dimensions: [1080, 1350], duration: 12 };
  const SEED = 129;
  const noise4D = makeNoise4D(SEED);
- 
- const palette = ['#FF4B41', '#9745FF','#72F5A4','#FFC0F0','#FFE64F'];
+ const palette = ['#FF4B41', '#9745FF', '#72F5A4', '#FFC0F0', '#FFE64F'];
  
  async function loadFont(name, url, descriptors = {}) {
    const f = new FontFace(name, `url(${url})`, descriptors);
-   await f.load();
-   document.fonts.add(f);
-   await document.fonts.ready;
+   await f.load(); document.fonts.add(f); await document.fonts.ready;
  }
- 
- function mapRange(v, a, b, c, d) {
-   return c + (d - c) * ((v - a) / (b - a));
- }
+ const mapRange = (v, a, b, c, d) => c + (d - c) * ((v - a) / (b - a));
  
  function fitCanvas(canvas, w, h) {
    const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -42,32 +28,35 @@
    return ctx;
  }
  
- function start() {
+ (async function main() {
+   await loadFont('CoupeurCarve', './assets/fonts/CoupeurCarve-SemiBold.otf', { weight: '100 900' });
+ 
    const canvas = document.getElementById('c');
    const [W, H] = settings.dimensions;
    const ctx = fitCanvas(canvas, W, H);
  
+   let raf = 0;
    let playing = true;
-   const t0 = performance.now();
  
-   (function frame(now) {
-     if (!playing) return requestAnimationFrame(frame);
-     const elapsed = (now - t0) / 1000;
-     const playhead = (elapsed % settings.duration) / settings.duration;
+   // аккуратное время: пауза/резюм без скачка фазы
+   let elapsed = 0;                  // сек
+   let baseTime = performance.now(); // ms
  
-     // bg
+   function render(playhead) {
+     // фон
      ctx.fillStyle = '#000';
      ctx.fillRect(0, 0, W, H);
- 
-     // titles
+     
+     // ТИТРЫ (как в твоём эталоне): GLITCH фиолетовым, Issue 02 чёрным (невиден), подзаголовок фиолетовый
      ctx.save();
-     ctx.fillStyle = '#9745FF';
      ctx.textAlign = 'center';
      ctx.textBaseline = 'middle';
+     
+     ctx.fillStyle = '#9745FF';
      ctx.font = `100 ${Math.round(W * 0.2)}px 'CoupeurCarve', sans-serif`;
      ctx.fillText('GLITCH', W / 2, H * 0.112);
- 
-     ctx.fillStyle = '#000 ';
+     
+     ctx.fillStyle = '#000'; // невидим на чёрном фоне
      ctx.font = `20px 'CoupeurCarve', sans-serif`;
      ctx.fillText('Issue 02', W * 0.515, H * 0.038);
      
@@ -76,7 +65,7 @@
      ctx.fillText('When Machines Dream in Noise', W / 2, H * 0.95);
      ctx.restore();
  
-     // grid
+     // СЕТКА
      const cols = 64, rows = 120;
      const margin = W * 0.1;
      const gw = W - margin * 2;
@@ -84,8 +73,7 @@
      const cw = gw / cols;
      const ch = gh / rows;
  
-     const speed = 1;
-     const angle = playhead * Math.PI * 2 * speed;
+     const angle = playhead * Math.PI * 2;
  
      for (let y = 0; y < rows; y++) {
        for (let x = 0; x < cols; x++) {
@@ -117,21 +105,37 @@
            ctx.fill();
          } else {
            ctx.beginPath();
-           ctx.arc(0, 0, radius, 150, Math.PI * 2);
+           ctx.arc(0, 0, radius, 0, Math.PI * 2); // 0, не "150"
            ctx.fill();
          }
          ctx.restore();
        }
      }
+   }
  
-     requestAnimationFrame(frame);
-   })(t0);
+   function tick(now) {
+     if (!playing) return;
+     elapsed = (now - baseTime) / 1000;
+     const playhead = (elapsed % settings.duration) / settings.duration;
+     render(playhead);
+     raf = requestAnimationFrame(tick);
+   }
  
-   document.getElementById('btnPlay')?.addEventListener('click', () => (playing = true, start()));
-   document.getElementById('btnPause')?.addEventListener('click', () => (playing = false));
- }
+   // публичный API для index.html
+   window.__demo = {
+     play() {
+       if (playing) return;
+       playing = true;
+       baseTime = performance.now() - elapsed * 1000; // продолжить с той же фазы
+       raf = requestAnimationFrame(tick);
+     },
+     pause() {
+       if (!playing) return;
+       playing = false;
+       cancelAnimationFrame(raf);
+     }
+   };
  
- (async () => {
-   await loadFont('CoupeurCarve', './assets/fonts/CoupeurCarve-SemiBold.otf', { weight: '100 900' });
-   start();
+   // старт
+   raf = requestAnimationFrame(tick);
  })();
