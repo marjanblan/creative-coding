@@ -24,6 +24,14 @@
   <main>
     <div class="stage"><canvas id="c"></canvas></div>
   </main>
-  <script src="./sketch.js"></script>
+  <script type="module" src="./sketch.js"></script>
+  <script>
+    // Проводка кнопок к публичному API скетча
+    btnPlay.onclick  = () => window.__demo?.play?.();
+    btnPause.onclick = () => window.__demo?.pause?.();
+    btnFS.onclick    = () => (!document.fullscreenElement
+      ? document.documentElement.requestFullscreen()
+      : document.exitFullscreen());
+  </script>
 </body>
 </html>

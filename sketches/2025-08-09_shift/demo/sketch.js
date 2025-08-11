@@ -8,31 +8,21 @@
  
  const settings = {
    dimensions: [1080, 1350],
-   animate: true,
-   duration: 12,
-   fps: 24,
-   pixelsPerInch: 72,
-   exportPixelRatio: 1
+   duration: 12
  };
  
  const SEED = 128;
  const noise4D = makeNoise4D(SEED);
- 
- const palette = ['#FF4B41', '#9745FF','#72F5A4','#FFC0F0','#FFE64F'];
+ const palette = ['#FF4B41', '#9745FF', '#72F5A4', '#FFC0F0', '#FFE64F'];
  
  async function loadFont(name, url, descriptors = {}) {
    const f = new FontFace(name, `url(${url})`, descriptors);
-   await f.load();
-   document.fonts.add(f);
-   await document.fonts.ready;
+   await f.load(); document.fonts.add(f); await document.fonts.ready;
  }
  
- function mapRange(v, a, b, c, d) {
-   return c + (d - c) * ((v - a) / (b - a));
- }
+ function mapRange(v, a, b, c, d) { return c + (d - c) * ((v - a) / (b - a)); }
  
  function fitCanvas(canvas, w, h) {
-   // подгон по DPR и без полос в live-view
    const dpr = Math.min(window.devicePixelRatio || 1, 2);
    canvas.width = Math.round(w * dpr);
    canvas.height = Math.round(h * dpr);
@@ -43,24 +33,26 @@
    return ctx;
  }
  
- function start() {
+ (async function main() {
+   await loadFont('CoupeurCarve', './assets/fonts/CoupeurCarve-SemiBold.otf', { weight: '100 900' });
+ 
    const canvas = document.getElementById('c');
    const [W, H] = settings.dimensions;
    const ctx = fitCanvas(canvas, W, H);
  
+   let raf = 0;
    let playing = true;
-   const t0 = performance.now();
  
-   (function frame(now) {
-     if (!playing) return requestAnimationFrame(frame);
-     const elapsed = (now - t0) / 1000;
-     const playhead = (elapsed % settings.duration) / settings.duration;
+   // чтобы пауза/резюм продолжали с той же фазы
+   let elapsed = 0;                  // сек
+   let baseTime = performance.now(); // ms
  
-     // background
+   function render(playhead) {
+     // фон
      ctx.fillStyle = '#000';
      ctx.fillRect(0, 0, W, H);
  
-     // title
+     // заголовки
      ctx.save();
      ctx.fillStyle = '#FF4B41';
      ctx.textAlign = 'center';
@@ -75,7 +67,7 @@
      ctx.fillText('The Year Everything Moved', W / 2, H * 0.95);
      ctx.restore();
  
-     // grid
+     // сетка
      const cols = 48, rows = 48;
      const margin = W * 0.1;
      const gw = W - margin * 2;
@@ -83,8 +75,7 @@
      const cw = gw / cols;
      const ch = gh / rows;
  
-     const speed = 1;
-     const angle = playhead * Math.PI * 2 * speed;
+     const angle = playhead * Math.PI * 2;
  
      for (let y = 0; y < rows; y++) {
        for (let x = 0; x < cols; x++) {
@@ -94,7 +85,6 @@
          const u = cols <= 1 ? 0.5 : x / (cols - 1);
          const v = rows <= 1 ? 0.5 : y / (rows - 1);
  
-         // seamless loop через 4D шум (cos,sin по окружности)
          const n = noise4D(u, v, Math.cos(angle), Math.sin(angle));
  
          const radius = cw * 0.5 * mapRange(n, -1, 1, 0.1, 2.4);
@@ -123,17 +113,33 @@
          ctx.restore();
        }
      }
+   }
  
-     requestAnimationFrame(frame);
-   })(t0);
+   function tick(now) {
+     if (!playing) return;
+     elapsed = (now - baseTime) / 1000;
+     const playhead = (elapsed % settings.duration) / settings.duration;
+     render(playhead);
+     raf = requestAnimationFrame(tick);
+   }
  
-   // UI
-   document.getElementById('btnPlay')?.addEventListener('click', () => (playing = true, start()));
-   document.getElementById('btnPause')?.addEventListener('click', () => (playing = false));
- }
+   // публичный API для кнопок
+   window.__demo = {
+     play() {
+       if (playing) return;
+       playing = true;
+       baseTime = performance.now() - elapsed * 1000; // продолжить с той же фазы
+       raf = requestAnimationFrame(tick);
+     },
+     pause() {
+       if (!playing) return;
+       playing = false;
+       cancelAnimationFrame(raf);
+     }
+   };
  
- (async () => {
-   await loadFont('CoupeurCarve', './assets/fonts/CoupeurCarve-SemiBold.otf', { weight: '100 900' });
-   start();
+   // старт
+   raf = requestAnimationFrame(tick);
  })();
+
 
