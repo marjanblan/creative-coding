@@ -107,7 +107,7 @@
            ctx.fill();
          } else {
            ctx.beginPath();
-           ctx.arc(0, 0, radius, 0, Math.PI * 2);
+           ctx.arc(0, 0, radius, 150, Math.PI * 2);
            ctx.fill();
          }
          ctx.restore();
